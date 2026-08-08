@@ -1,0 +1,603 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+
+/* ========================= */
+/* SIDEBAR */
+/* ========================= */
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+
+    width: 240px;
+    height: 100vh;
+
+    background: #111827;
+    color: white;
+
+    padding: 25px 15px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px 30px;
+}
+
+.logo span {
+    font-size: 28px;
+}
+
+.logo h2 {
+    font-size: 21px;
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-item {
+    border: none;
+    background: transparent;
+
+    color: #cbd5e1;
+
+    padding: 13px 15px;
+
+    border-radius: 8px;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.nav-item:hover,
+.nav-item.active {
+    background: #2563eb;
+    color: white;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+}
+
+.logout-btn {
+    width: 100%;
+
+    border: 1px solid #374151;
+
+    background: transparent;
+
+    color: #cbd5e1;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+/* ========================= */
+/* MAIN */
+/* ========================= */
+
+.main-content {
+    margin-left: 240px;
+
+    min-height: 100vh;
+
+    padding: 30px 40px;
+}
+
+
+/* ========================= */
+/* TOPBAR */
+/* ========================= */
+
+.topbar {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 35px;
+}
+
+.topbar h1 {
+    font-size: 28px;
+
+    margin-bottom: 5px;
+}
+
+.topbar p {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.profile strong {
+    display: block;
+
+    font-size: 14px;
+}
+
+.profile small {
+    color: #6b7280;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+    font-weight: bold;
+}
+
+
+/* ========================= */
+/* SECTIONS */
+/* ========================= */
+
+.section {
+    display: none;
+}
+
+.active-section {
+    display: block;
+}
+
+
+/* ========================= */
+/* ACCOUNT CARD */
+/* ========================= */
+
+.account-card {
+    background: #2563eb;
+
+    color: white;
+
+    border-radius: 15px;
+
+    padding: 30px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+
+    margin-bottom: 35px;
+}
+
+.account-card span {
+    font-size: 13px;
+
+    opacity: 0.8;
+}
+
+.account-card h2 {
+    margin-top: 8px;
+
+    font-size: 34px;
+}
+
+.account-info {
+    text-align: right;
+}
+
+.account-info strong {
+    display: block;
+
+    margin-top: 8px;
+
+    font-size: 18px;
+}
+
+
+/* ========================= */
+/* HEADINGS */
+/* ========================= */
+
+.section-heading {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 18px;
+
+    margin-top: 25px;
+}
+
+.section-heading h2 {
+    font-size: 19px;
+}
+
+.section-heading p {
+    color: #6b7280;
+
+    font-size: 13px;
+
+    margin-top: 4px;
+}
+
+
+/* ========================= */
+/* QUICK ACTIONS */
+/* ========================= */
+
+.quick-actions {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 15px;
+}
+
+.quick-actions button {
+    border: none;
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 12px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+
+    transition: 0.2s;
+}
+
+.quick-actions button:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.quick-actions span {
+    font-size: 25px;
+
+    display: block;
+
+    margin-bottom: 15px;
+}
+
+.quick-actions strong {
+    display: block;
+
+    font-size: 15px;
+
+    margin-bottom: 5px;
+}
+
+.quick-actions small {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* ========================= */
+/* FORM CARD */
+/* ========================= */
+
+.form-card {
+    max-width: 600px;
+
+    background: white;
+
+    border-radius: 15px;
+
+    padding: 30px;
+
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+.big-icon {
+    font-size: 35px;
+}
+
+.form-header h2 {
+    font-size: 21px;
+}
+
+.form-header p {
+    color: #6b7280;
+
+    font-size: 13px;
+
+    margin-top: 5px;
+}
+
+.form-card label {
+    display: block;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+    margin-top: 18px;
+
+    margin-bottom: 7px;
+}
+
+.form-card input {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    outline: none;
+
+    font-size: 14px;
+}
+
+.form-card input:focus {
+    border-color: #2563eb;
+}
+
+
+/* ========================= */
+/* BUTTON */
+/* ========================= */
+
+.primary-btn {
+    border: none;
+
+    background: #2563eb;
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    margin-top: 22px;
+
+    font-weight: bold;
+}
+
+.primary-btn:hover {
+    background: #1d4ed8;
+}
+
+.primary-btn.small {
+    margin-top: 0;
+
+    padding: 9px 15px;
+
+    font-size: 12px;
+}
+
+.view-btn {
+    border: none;
+
+    background: transparent;
+
+    color: #2563eb;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+
+/* ========================= */
+/* TRANSACTIONS */
+/* ========================= */
+
+.transaction-list {
+    background: white;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.transaction {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.transaction:last-child {
+    border-bottom: none;
+}
+
+.transaction-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+.transaction-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: #eff6ff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.transaction strong {
+    display: block;
+
+    font-size: 14px;
+}
+
+.transaction small {
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 11px;
+
+    margin-top: 4px;
+}
+
+.transaction-amount {
+    font-weight: bold;
+}
+
+.deposit {
+    color: #16a34a;
+}
+
+.withdraw {
+    color: #dc2626;
+}
+
+.transfer {
+    color: #2563eb;
+}
+
+
+/* ========================= */
+/* EMPTY */
+/* ========================= */
+
+.empty-state {
+    padding: 35px;
+
+    text-align: center;
+
+    color: #9ca3af;
+
+    font-size: 14px;
+}
+
+
+/* ========================= */
+/* MESSAGE */
+/* ========================= */
+
+#depositMessage,
+#withdrawMessage,
+#transferMessage {
+    margin-top: 15px;
+
+    font-size: 13px;
+}
+
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 200px;
+    }
+
+    .main-content {
+        margin-left: 200px;
+
+        padding: 25px;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+
+        padding: 20px;
+    }
+
+    .account-card {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 25px;
+    }
+
+    .account-info {
+        text-align: left;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}

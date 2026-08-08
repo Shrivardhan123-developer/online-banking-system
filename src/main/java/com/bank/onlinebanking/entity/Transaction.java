@@ -26,6 +26,7 @@ public class Transaction {
     @Column(nullable = false)
     private String type;
 
+    @Column
     private String description;
 
     @Column(nullable = false)

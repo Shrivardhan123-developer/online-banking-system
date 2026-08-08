@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Online Banking</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ============================= -->
+    <!-- SIDEBAR -->
+    <!-- ============================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <span>🏦</span>
+            <h2>BankFlow</h2>
+        </div>
+
+        <nav>
+
+            <button class="nav-item active" onclick="showSection('dashboard')">
+                🏠 Dashboard
+            </button>
+
+            <button class="nav-item" onclick="showSection('deposit')">
+                💰 Deposit
+            </button>
+
+            <button class="nav-item" onclick="showSection('withdraw')">
+                💸 Withdraw
+            </button>
+
+            <button class="nav-item" onclick="showSection('transfer')">
+                🔄 Transfer
+            </button>
+
+            <button class="nav-item" onclick="showSection('transactions')">
+                📋 Transactions
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="logout-btn" onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- ============================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================= -->
+
+    <main class="main-content">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+                <h1 id="page-title">Dashboard</h1>
+                <p>Welcome back to your banking dashboard.</p>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">ST</div>
+
+                <div>
+                    <strong>Shrivardhan Tyagi</strong>
+                    <small>Customer</small>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- ============================= -->
+        <!-- DASHBOARD -->
+        <!-- ============================= -->
+
+        <section id="dashboard" class="section active-section">
+
+            <div class="account-card">
+
+                <div>
+                    <span>Available Balance</span>
+
+                    <h2 id="dashboardBalance">
+                        ₹0.00
+                    </h2>
+                </div>
+
+                <div class="account-info">
+
+                    <span>Account Number</span>
+
+                    <strong id="dashboardAccount">
+                        2687074414
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- QUICK ACTIONS -->
+
+            <div class="section-heading">
+
+                <h2>Quick Actions</h2>
+
+                <p>Manage your money easily.</p>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+                <button onclick="showSection('deposit')">
+                    <span>💰</span>
+                    <strong>Deposit</strong>
+                    <small>Add money to account</small>
+                </button>
+
+                <button onclick="showSection('withdraw')">
+                    <span>💸</span>
+                    <strong>Withdraw</strong>
+                    <small>Withdraw money</small>
+                </button>
+
+                <button onclick="showSection('transfer')">
+                    <span>🔄</span>
+                    <strong>Transfer</strong>
+                    <small>Send money</small>
+                </button>
+
+                <button onclick="showSection('transactions')">
+                    <span>📋</span>
+                    <strong>History</strong>
+                    <small>View transactions</small>
+                </button>
+
+            </div>
+
+
+            <!-- RECENT TRANSACTIONS -->
+
+            <div class="section-heading">
+
+                <h2>Recent Transactions</h2>
+
+                <button
+                    class="view-btn"
+                    onclick="showSection('transactions')">
+                    View All
+                </button>
+
+            </div>
+
+            <div id="recentTransactions" class="transaction-list">
+
+                <div class="empty-state">
+                    No transactions yet.
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================= -->
+        <!-- DEPOSIT -->
+        <!-- ============================= -->
+
+        <section id="deposit" class="section">
+
+            <div class="form-card">
+
+                <div class="form-header">
+                    <span class="big-icon">💰</span>
+
+                    <div>
+                        <h2>Deposit Money</h2>
+                        <p>Add money to your bank account.</p>
+                    </div>
+                </div>
+
+                <label>Account Number</label>
+
+                <input
+                    id="depositAccount"
+                    type="text"
+                    value="2687074414"
+                    readonly
+                >
+
+                <label>Amount</label>
+
+                <input
+                    id="depositAmount"
+                    type="number"
+                    placeholder="Enter amount"
+                    min="1"
+                >
+
+                <button
+                    class="primary-btn"
+                    onclick="depositMoney()">
+
+                    Deposit Money
+
+                </button>
+
+                <div id="depositMessage"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================= -->
+        <!-- WITHDRAW -->
+        <!-- ============================= -->
+
+        <section id="withdraw" class="section">
+
+            <div class="form-card">
+
+                <div class="form-header">
+                    <span class="big-icon">💸</span>
+
+                    <div>
+                        <h2>Withdraw Money</h2>
+                        <p>Withdraw money from your account.</p>
+                    </div>
+                </div>
+
+                <label>Account Number</label>
+
+                <input
+                    id="withdrawAccount"
+                    type="text"
+                    value="2687074414"
+                    readonly
+                >
+
+                <label>Amount</label>
+
+                <input
+                    id="withdrawAmount"
+                    type="number"
+                    placeholder="Enter amount"
+                    min="1"
+                >
+
+                <button
+                    class="primary-btn"
+                    onclick="withdrawMoney()">
+
+                    Withdraw Money
+
+                </button>
+
+                <div id="withdrawMessage"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================= -->
+        <!-- TRANSFER -->
+        <!-- ============================= -->
+
+        <section id="transfer" class="section">
+
+            <div class="form-card">
+
+                <div class="form-header">
+                    <span class="big-icon">🔄</span>
+
+                    <div>
+                        <h2>Transfer Money</h2>
+                        <p>Transfer money to another account.</p>
+                    </div>
+                </div>
+
+                <label>Sender Account</label>
+
+                <input
+                    id="senderAccount"
+                    type="text"
+                    value="2687074414"
+                    readonly
+                >
+
+                <label>Receiver Account</label>
+
+                <input
+                    id="receiverAccount"
+                    type="text"
+                    placeholder="Enter receiver account"
+                >
+
+                <label>Amount</label>
+
+                <input
+                    id="transferAmount"
+                    type="number"
+                    placeholder="Enter amount"
+                    min="1"
+                >
+
+                <button
+                    class="primary-btn"
+                    onclick="transferMoney()">
+
+                    Transfer Money
+
+                </button>
+
+                <div id="transferMessage"></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ============================= -->
+        <!-- TRANSACTIONS -->
+        <!-- ============================= -->
+
+        <section id="transactions" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <h2>Transaction History</h2>
+                    <p>Your latest banking activity.</p>
+                </div>
+
+                <button
+                    class="primary-btn small"
+                    onclick="loadTransactions()">
+
+                    Refresh
+
+                </button>
+
+            </div>
+
+            <div
+                id="allTransactions"
+                class="transaction-list">
+
+                <div class="empty-state">
+                    No transactions yet.
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
