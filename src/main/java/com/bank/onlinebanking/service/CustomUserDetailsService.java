@@ -1,4 +1,4 @@
-package com.bank.onlinebanking.security;
+package com.bank.onlinebanking.service;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,9 +14,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final CustomerRepository customerRepository;
 
-    public CustomUserDetailsService(
-            CustomerRepository customerRepository) {
-
+    public CustomUserDetailsService(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }
 
@@ -24,18 +22,18 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
 
-        Customer customer = customerRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "Customer not found with email: " + email
-                        )
-                );
+        Customer customer =
+                customerRepository.findByEmail(email)
+                        .orElseThrow(() ->
+                                new UsernameNotFoundException(
+                                        "Customer not found with email: "
+                                                + email));
 
         return User.builder()
                 .username(customer.getEmail())
                 .password(customer.getPassword())
-                .roles("CUSTOMER")
+                .roles(customer.getRole())
+                .disabled(!"ACTIVE".equalsIgnoreCase(customer.getStatus()))
                 .build();
     }
 }

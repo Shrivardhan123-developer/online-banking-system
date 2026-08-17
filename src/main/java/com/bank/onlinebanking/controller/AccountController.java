@@ -16,16 +16,27 @@ import com.bank.onlinebanking.dto.AccountBalanceResponse;
 import com.bank.onlinebanking.dto.AccountResponse;
 import com.bank.onlinebanking.dto.DepositRequest;
 import com.bank.onlinebanking.entity.Account;
+import com.bank.onlinebanking.entity.Customer;
 import com.bank.onlinebanking.service.AccountService;
+import com.bank.onlinebanking.service.CustomerService;
+import com.bank.onlinebanking.service.TransferService;
 
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
 
     private final AccountService accountService;
+    private final CustomerService customerService;
+    private final TransferService transferService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(
+            AccountService accountService,
+            CustomerService customerService,
+            TransferService transferService) {
+
         this.accountService = accountService;
+        this.customerService = customerService;
+        this.transferService = transferService;
     }
 
     // =====================================================
@@ -38,8 +49,19 @@ public class AccountController {
             @RequestParam Long customerId,
             @RequestParam String accountType) {
 
+        Customer current =
+                customerService.getCurrentCustomer();
+
+        // Customers may only create accounts for themselves;
+        // admins may create for any customer. Never trust a
+        // customer-supplied id.
+        Customer target =
+                "ADMIN".equalsIgnoreCase(current.getRole())
+                        ? customerService.getCustomerById(customerId)
+                        : current;
+
         Account account = accountService.createAccount(
-                customerId,
+                target,
                 accountType
         );
 
@@ -61,6 +83,37 @@ public class AccountController {
     }
 
     // =====================================================
+    // GET ACCOUNT DETAILS
+    // GET /api/accounts/{accountNumber}
+    // =====================================================
+
+    @GetMapping("/{accountNumber}")
+    public ResponseEntity<AccountResponse> getAccountDetails(
+            @PathVariable String accountNumber) {
+
+        Customer current =
+                customerService.getCurrentCustomer();
+
+        Account account =
+                "ADMIN".equalsIgnoreCase(current.getRole())
+                        ? accountService.findAccountByNumber(accountNumber)
+                        : accountService.getOwnedAccount(current, accountNumber);
+
+        AccountResponse response = new AccountResponse(
+                account.getId(),
+                account.getAccountNumber(),
+                account.getAccountType(),
+                account.getBalance(),
+                account.getStatus(),
+                account.getCustomer().getId(),
+                account.getCustomer().getFullName(),
+                account.getCustomer().getEmail()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    // =====================================================
     // DEPOSIT MONEY
     // POST /api/accounts/deposit
     // =====================================================
@@ -69,9 +122,13 @@ public class AccountController {
     public ResponseEntity<AccountBalanceResponse> deposit(
             @RequestBody DepositRequest request) {
 
+        Customer customer =
+                customerService.getCurrentCustomer();
+
         Account account = accountService.deposit(
                 request.getAccountNumber(),
-                request.getAmount()
+                request.getAmount(),
+                customer
         );
 
         AccountBalanceResponse response =
@@ -94,9 +151,13 @@ public class AccountController {
     public ResponseEntity<AccountBalanceResponse> withdraw(
             @RequestBody DepositRequest request) {
 
+        Customer customer =
+                customerService.getCurrentCustomer();
+
         Account account = accountService.withdraw(
                 request.getAccountNumber(),
-                request.getAmount()
+                request.getAmount(),
+                customer
         );
 
         AccountBalanceResponse response =
@@ -121,10 +182,15 @@ public class AccountController {
             @RequestParam String receiverAccountNumber,
             @RequestParam BigDecimal amount) {
 
-        accountService.transfer(
+        Customer customer =
+                customerService.getCurrentCustomer();
+
+        transferService.transfer(
+                customer.getId(),
                 senderAccountNumber,
                 receiverAccountNumber,
-                amount
+                amount,
+                null
         );
 
         return ResponseEntity.ok(
@@ -141,8 +207,13 @@ public class AccountController {
     public ResponseEntity<AccountBalanceResponse> getBalance(
             @PathVariable String accountNumber) {
 
+        Customer current =
+                customerService.getCurrentCustomer();
+
         Account account =
-                accountService.findByAccountNumber(accountNumber);
+                "ADMIN".equalsIgnoreCase(current.getRole())
+                        ? accountService.findAccountByNumber(accountNumber)
+                        : accountService.getOwnedAccount(current, accountNumber);
 
         AccountBalanceResponse response =
                 new AccountBalanceResponse(

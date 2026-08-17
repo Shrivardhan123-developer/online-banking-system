@@ -9,6 +9,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.bank.onlinebanking.service.CustomUserDetailsService;
 import com.bank.onlinebanking.service.JwtService;
 
 import jakarta.servlet.FilterChain;
@@ -73,7 +74,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userDetailsService
                                 .loadUserByUsername(email);
 
-                if (jwtService.isTokenValid(token)) {
+                if (jwtService.isTokenValid(token)
+                        && userDetails.isEnabled()) {
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(

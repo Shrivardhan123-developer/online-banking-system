@@ -1,0 +1,291 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #172033;
+}
+
+.register-page {
+    min-height: 100vh;
+    display: flex;
+}
+
+
+/* =====================================================
+   LEFT BRAND SECTION
+   ===================================================== */
+
+.register-brand {
+    width: 45%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            #334155,
+            transparent 40%
+        ),
+        linear-gradient(
+            145deg,
+            #0f172a,
+            #1e293b
+        );
+
+    color: white;
+}
+
+.brand-content {
+    width: 80%;
+    max-width: 500px;
+}
+
+.brand-logo {
+    width: 70px;
+    height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    font-size: 34px;
+
+    margin-bottom: 25px;
+}
+
+.brand-content h1 {
+    font-size: 52px;
+    letter-spacing: -2px;
+    margin-bottom: 15px;
+}
+
+.brand-content p {
+    font-size: 18px;
+    line-height: 1.6;
+
+    color: #cbd5e1;
+
+    margin-bottom: 30px;
+}
+
+.feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    color: #e2e8f0;
+}
+
+
+/* =====================================================
+   REGISTER CONTAINER
+   ===================================================== */
+
+.register-container {
+    width: 55%;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 470px;
+
+    background: white;
+
+    padding: 38px;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.register-header {
+    margin-bottom: 25px;
+}
+
+.mobile-logo {
+    display: none;
+}
+
+.register-header h2 {
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.register-header p {
+    color: #64748b;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   FORM
+   ===================================================== */
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    margin-bottom: 7px;
+
+    color: #334155;
+}
+
+.form-group input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #dbe1ea;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition: 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+
+/* =====================================================
+   BUTTON
+   ===================================================== */
+
+.register-btn {
+    width: 100%;
+
+    border: none;
+
+    padding: 14px;
+
+    margin-top: 5px;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.register-btn:hover {
+    background: #1d4ed8;
+}
+
+.register-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   MESSAGE
+   ===================================================== */
+
+.register-message {
+    min-height: 22px;
+
+    margin-top: 14px;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.register-footer {
+    margin-top: 22px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #eef2f7;
+
+    text-align: center;
+}
+
+.register-footer p {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.register-footer a {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 850px) {
+
+    .register-brand {
+        display: none;
+    }
+
+    .register-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .register-card {
+        padding: 30px 25px;
+    }
+
+    .mobile-logo {
+        display: block;
+        font-size: 35px;
+        margin-bottom: 15px;
+    }
+}

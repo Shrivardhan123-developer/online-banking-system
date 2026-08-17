@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bank.onlinebanking.entity.Transaction;
+import com.bank.onlinebanking.dto.TransactionResponse;
+import com.bank.onlinebanking.entity.Customer;
+import com.bank.onlinebanking.service.CustomerService;
 import com.bank.onlinebanking.service.TransactionService;
 
 @RestController
@@ -16,22 +18,31 @@ import com.bank.onlinebanking.service.TransactionService;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final CustomerService customerService;
 
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(
+            TransactionService transactionService,
+            CustomerService customerService) {
+
         this.transactionService = transactionService;
+        this.customerService = customerService;
     }
 
-    // =========================
-    // GET TRANSACTION HISTORY
-    // =========================
+    // =====================================================
+    // GET TRANSACTIONS BY ACCOUNT NUMBER
+    // All business logic (ownership + history) lives in
+    // TransactionService. This controller stays thin.
+    // =====================================================
 
-    @GetMapping("/account/{accountId}")
-    public ResponseEntity<List<Transaction>> getTransactionHistory(
-            @PathVariable Long accountId) {
+    @GetMapping("/{accountNumber}")
+    public ResponseEntity<List<TransactionResponse>> getTransactions(
+            @PathVariable String accountNumber) {
 
-        List<Transaction> transactions =
-                transactionService.getTransactionHistory(accountId);
+        Customer current =
+                customerService.getCurrentCustomer();
 
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(
+                transactionService.getAccountHistory(
+                        current, accountNumber));
     }
 }

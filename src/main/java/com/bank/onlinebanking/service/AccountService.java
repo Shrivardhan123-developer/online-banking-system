@@ -2,6 +2,7 @@ package com.bank.onlinebanking.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 import org.springframework.stereotype.Service;
@@ -10,248 +11,236 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bank.onlinebanking.entity.Account;
 import com.bank.onlinebanking.entity.Customer;
 import com.bank.onlinebanking.entity.Transaction;
+import com.bank.onlinebanking.exception.AccountNotActiveException;
+import com.bank.onlinebanking.exception.InsufficientBalanceException;
+import com.bank.onlinebanking.exception.InvalidTransactionException;
+import com.bank.onlinebanking.exception.ResourceNotFoundException;
+import com.bank.onlinebanking.exception.UnauthorizedOperationException;
 import com.bank.onlinebanking.repository.AccountRepository;
-import com.bank.onlinebanking.repository.CustomerRepository;
 import com.bank.onlinebanking.repository.TransactionRepository;
 
 @Service
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final CustomerRepository customerRepository;
     private final TransactionRepository transactionRepository;
+    private final AuditService auditService;
 
     public AccountService(
             AccountRepository accountRepository,
-            CustomerRepository customerRepository,
-            TransactionRepository transactionRepository) {
+            TransactionRepository transactionRepository,
+            AuditService auditService) {
 
         this.accountRepository = accountRepository;
-        this.customerRepository = customerRepository;
         this.transactionRepository = transactionRepository;
+        this.auditService = auditService;
     }
 
     // =====================================================
     // CREATE ACCOUNT
     // =====================================================
 
-    public Account createAccount(Long customerId, String accountType) {
+    @Transactional
+    public Account createAccount(Customer customer, String accountType) {
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        String type = normaliseType(accountType);
+
+        if (customer == null) {
+            throw new InvalidTransactionException("Customer is required");
+        }
 
         Account account = new Account();
-
-        account.setAccountNumber(generateAccountNumber());
-        account.setAccountType(accountType);
-        account.setBalance(BigDecimal.ZERO);
+        account.setAccountNumber(generateUniqueAccountNumber());
+        account.setAccountType(type);
+        account.setBalance(BigDecimal.ZERO.setScale(2));
         account.setStatus("ACTIVE");
         account.setCustomer(customer);
 
-        return accountRepository.save(account);
+        Account saved = accountRepository.save(account);
+
+        auditService.log("ACCOUNT_CREATED",
+                "Created " + type + " account " + saved.getAccountNumber(),
+                customer.getEmail());
+
+        return saved;
+    }
+// =====================================================
+    // READ METHODS
+    // =====================================================
+
+    public List<Account> getAccountsForCustomer(Long customerId) {
+        return accountRepository.findByCustomerId(customerId);
     }
 
-    // =====================================================
-    // FIND ACCOUNT
-    // =====================================================
+    /**
+     * Looks up an account and enforces that it belongs to the given
+     * customer. Used to protect all customer-facing account endpoints.
+     */
+    public Account getOwnedAccount(Customer customer, String accountNumber) {
 
-    public Account findByAccountNumber(String accountNumber) {
+        Account account = accountRepository
+                .findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Account not found with number: " + accountNumber));
 
+        if (!account.getCustomer().getId().equals(customer.getId())) {
+            throw new UnauthorizedOperationException(
+                    "You do not have access to this account");
+        }
+
+        return account;
+    }
+
+    public Account findAccountByNumber(String accountNumber) {
         return accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Account not found with number: " + accountNumber));
+    }
+
+    public BigDecimal getBalance(Customer customer, String accountNumber) {
+        return getOwnedAccount(customer, accountNumber).getBalance();
+    }
+
+    public List<Transaction> getRecentTransactions(Customer customer, int limit) {
+        return getAccountsForCustomer(customer.getId()).stream()
+                .findFirst()
+                .map(account -> transactionRepository
+                        .findByAccountAccountNumberOrderByTransactionDateDesc(
+                                account.getAccountNumber()))
+                .orElse(List.of())
+                .stream()
+                .limit(limit)
+                .toList();
     }
 
     // =====================================================
-    // DEPOSIT MONEY
+    // DEPOSIT
     // =====================================================
 
     @Transactional
-    public Account deposit(String accountNumber, BigDecimal amount) {
+    public Account deposit(String accountNumber, BigDecimal amount, Customer customer) {
 
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException(
-                    "Deposit amount must be greater than zero");
-        }
+        validateAmount(amount, "Deposit");
 
-        Account account = findByAccountNumber(accountNumber);
+        Account account = findLockedForUpdate(accountNumber);
 
-        checkActiveAccount(account);
+        ensureOwnership(customer, account);
+        requireActive(account);
 
-        BigDecimal newBalance =
-                account.getBalance().add(amount);
+        account.setBalance(account.getBalance().add(amount));
 
-        account.setBalance(newBalance);
-
-        Account savedAccount = accountRepository.save(account);
+        Account saved = accountRepository.save(account);
 
         Transaction transaction = new Transaction();
-
         transaction.setAmount(amount);
         transaction.setType("DEPOSIT");
         transaction.setDescription("Cash deposit");
+        transaction.setStatus("COMPLETED");
+        transaction.setBalanceAfterTransaction(saved.getBalance());
         transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setAccount(savedAccount);
+        transaction.setAccount(saved);
 
         transactionRepository.save(transaction);
 
-        return savedAccount;
+        auditService.log("DEPOSIT",
+                "Deposited " + amount + " to account " + accountNumber,
+                customer.getEmail());
+
+        return saved;
     }
 
     // =====================================================
-    // WITHDRAW MONEY
+    // WITHDRAW
     // =====================================================
 
     @Transactional
-    public Account withdraw(String accountNumber, BigDecimal amount) {
+    public Account withdraw(String accountNumber, BigDecimal amount, Customer customer) {
 
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException(
-                    "Withdrawal amount must be greater than zero");
-        }
+        validateAmount(amount, "Withdrawal");
 
-        Account account = findByAccountNumber(accountNumber);
+        Account account = findLockedForUpdate(accountNumber);
 
-        checkActiveAccount(account);
+        ensureOwnership(customer, account);
+        requireActive(account);
 
-        // Check sufficient balance
         if (account.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException(
+                    "Insufficient balance in account " + accountNumber);
         }
 
-        BigDecimal newBalance =
-                account.getBalance().subtract(amount);
+        account.setBalance(account.getBalance().subtract(amount));
 
-        account.setBalance(newBalance);
-
-        Account savedAccount = accountRepository.save(account);
+        Account saved = accountRepository.save(account);
 
         Transaction transaction = new Transaction();
-
         transaction.setAmount(amount);
         transaction.setType("WITHDRAW");
         transaction.setDescription("Cash withdrawal");
+        transaction.setStatus("COMPLETED");
+        transaction.setBalanceAfterTransaction(saved.getBalance());
         transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setAccount(savedAccount);
+        transaction.setAccount(saved);
 
         transactionRepository.save(transaction);
 
-        return savedAccount;
+        auditService.log("WITHDRAW",
+                "Withdrawn " + amount + " from account " + accountNumber,
+                customer.getEmail());
+
+        return saved;
+    }
+// =====================================================
+    // HELPERS
+    // =====================================================
+
+    /**
+     * Loads the account with a pessimistic write lock so two concurrent
+     * withdrawals/transfers cannot both observe the same balance.
+     */
+    private Account findLockedForUpdate(String accountNumber) {
+        return accountRepository
+                .findByAccountNumberForUpdate(accountNumber)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Account not found with number: " + accountNumber));
     }
 
-    // =====================================================
-    // TRANSFER MONEY
-    // =====================================================
-
-    @Transactional
-    public void transfer(
-            String senderAccountNumber,
-            String receiverAccountNumber,
-            BigDecimal amount) {
-
+    private void validateAmount(BigDecimal amount, String operation) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException(
-                    "Transfer amount must be greater than zero");
+            throw new InvalidTransactionException(
+                    operation + " amount must be greater than zero");
         }
-
-        if (senderAccountNumber.equals(receiverAccountNumber)) {
-            throw new RuntimeException(
-                    "Sender and receiver accounts cannot be same");
-        }
-
-        Account sender =
-                findByAccountNumber(senderAccountNumber);
-
-        Account receiver =
-                findByAccountNumber(receiverAccountNumber);
-
-        checkActiveAccount(sender);
-        checkActiveAccount(receiver);
-
-        // Check sender balance
-        if (sender.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException(
-                    "Insufficient balance in sender account");
-        }
-
-        // =========================
-        // Deduct from sender
-        // =========================
-
-        sender.setBalance(
-                sender.getBalance().subtract(amount)
-        );
-
-        // =========================
-        // Add to receiver
-        // =========================
-
-        receiver.setBalance(
-                receiver.getBalance().add(amount)
-        );
-
-        accountRepository.save(sender);
-        accountRepository.save(receiver);
-
-        // =========================
-        // Sender transaction
-        // =========================
-
-        Transaction senderTransaction = new Transaction();
-
-        senderTransaction.setAmount(amount);
-        senderTransaction.setType("TRANSFER_OUT");
-        senderTransaction.setDescription(
-                "Transfer to account " + receiverAccountNumber
-        );
-        senderTransaction.setTransactionDate(
-                LocalDateTime.now()
-        );
-        senderTransaction.setAccount(sender);
-
-        transactionRepository.save(senderTransaction);
-
-        // =========================
-        // Receiver transaction
-        // =========================
-
-        Transaction receiverTransaction = new Transaction();
-
-        receiverTransaction.setAmount(amount);
-        receiverTransaction.setType("TRANSFER_IN");
-        receiverTransaction.setDescription(
-                "Transfer from account " + senderAccountNumber
-        );
-        receiverTransaction.setTransactionDate(
-                LocalDateTime.now()
-        );
-        receiverTransaction.setAccount(receiver);
-
-        transactionRepository.save(receiverTransaction);
     }
 
-    // =====================================================
-    // CHECK ACCOUNT STATUS
-    // =====================================================
+    private void ensureOwnership(Customer customer, Account account) {
+        if (!account.getCustomer().getId().equals(customer.getId())) {
+            throw new UnauthorizedOperationException(
+                    "You do not have access to this account");
+        }
+    }
 
-    private void checkActiveAccount(Account account) {
-
+    private void requireActive(Account account) {
         if (!"ACTIVE".equals(account.getStatus())) {
-            throw new RuntimeException(
-                    "Account is not active");
+            throw new AccountNotActiveException(
+                    "Account " + account.getAccountNumber() + " is not active");
         }
     }
 
-    // =====================================================
-    // GENERATE ACCOUNT NUMBER
-    // =====================================================
+    private String normaliseType(String accountType) {
+        String type = accountType == null ? "" : accountType.trim().toUpperCase();
+        if (!type.equals("SAVINGS") && !type.equals("CURRENT")) {
+            throw new InvalidTransactionException(
+                    "Account type must be SAVINGS or CURRENT");
+        }
+        return type;
+    }
 
-    private String generateAccountNumber() {
-
+    private String generateUniqueAccountNumber() {
         Random random = new Random();
-
-        long number =
-                1000000000L + random.nextLong(9000000000L);
-
-        return String.valueOf(number);
+        String number;
+        do {
+            number = String.valueOf(
+                    1000000000L + random.nextLong(9000000000L));
+        } while (accountRepository.findByAccountNumber(number).isPresent());
+        return number;
     }
 }
