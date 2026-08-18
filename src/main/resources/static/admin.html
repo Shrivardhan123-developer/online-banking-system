@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>BankFlow Admin Console</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        /* =================================================
+           ADMIN CONSOLE STYLES
+        ================================================== */
+
+        .admin-toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .admin-toolbar input,
+        .admin-toolbar select {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+            min-width: 200px;
+        }
+
+        .btn {
+            padding: 10px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: #2563eb; color: #fff; }
+        .btn-danger  { background: #e11d48; color: #fff; }
+        .btn-success { background: #16a34a; color: #fff; }
+        .btn-outline {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 12px 14px;
+            text-align: left;
+            font-size: 13px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: middle;
+        }
+
+        .admin-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-active    { background: #dcfce7; color: #15803d; }
+        .badge-suspended { background: #fee2e2; color: #b91c1c; }
+        .badge-inactive  { background: #f1f5f9; color: #64748b; }
+
+        .detail-panel {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .detail-grid > div {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .detail-grid .label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-grid .value {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .pagination .info {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+        }
+
+        .stat-card span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .stat-card h2 {
+            margin-top: 8px;
+            font-size: 24px;
+        }
+
+        .stat-card p {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .message-bar {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message-bar.error {
+            display: block;
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .message-bar.success {
+            display: block;
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .message-bar.info {
+            display: block;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        @media (max-width: 1100px) {
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+<!-- =================================================
+         ADMIN SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <span>🏦</span>
+
+            <h2>BankFlow</h2>
+
+        </div>
+
+
+        <nav>
+
+            <button
+                class="nav-item active"
+                data-section="overview"
+                onclick="showSection('overview')">
+                Overview
+            </button>
+
+            <button
+                class="nav-item"
+                data-section="customers"
+                onclick="showSection('customers')">
+                Customers
+            </button>
+
+            <button
+                class="nav-item"
+                data-section="accounts"
+                onclick="showSection('accounts')">
+                Accounts
+            </button>
+
+            <button
+                class="nav-item"
+                data-section="audit"
+                onclick="showSection('audit')">
+                Audit Logs
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="logout-btn"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =================================================
+         ADMIN MAIN CONTENT
+    ================================================== -->
+
+    <main class="main-content">
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="welcome-small">
+                    Admin Console
+                </p>
+
+                <h1 data-admin-name>
+                    Administrator
+                </h1>
+
+            </div>
+
+
+            <div class="profile">
+
+                <div class="avatar">
+                    🛡️
+                </div>
+
+                <div>
+
+                    <strong data-admin-name>
+                        Administrator
+                    </strong>
+
+                    <small data-admin-email>
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="adminMessage"
+            class="message-bar">
+        </div>
+
+
+        <!-- =================================================
+             OVERVIEW
+        ================================================== -->
+
+        <section
+            id="section-overview"
+            class="admin-section active">
+
+            <div class="dashboard-section">
+
+                <div class="section-header">
+
+                    <h2>
+                        System Overview
+                    </h2>
+
+                    <p>
+                        Live statistics computed from the bank database
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="overviewExtra"
+                    class="detail-panel">
+                </div>
+
+
+                <div
+                    id="statCards"
+                    class="stat-grid">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CUSTOMERS
+        ================================================== -->
+
+        <section
+            id="section-customers"
+            class="admin-section">
+
+            <div class="dashboard-section">
+
+                <div class="section-header">
+
+                    <h2>Customers</h2>
+
+                    <p>
+                        Search, inspect and manage customer accounts
+                    </p>
+
+                </div>
+
+
+                <div class="admin-toolbar">
+
+                    <input
+                        id="customerSearch"
+                        type="text"
+                        placeholder="Search by name or email...">
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="loadCustomers(0)">
+                        Search
+                    </button>
+
+                </div>
+
+
+                <div id="customersContainer">
+                </div>
+
+            </div>
+
+
+            <div id="customerDetailPanel">
+            </div>
+
+        </section>
+<!-- =================================================
+             ACCOUNTS
+        ================================================== -->
+
+        <section
+            id="section-accounts"
+            class="admin-section">
+
+            <div class="dashboard-section">
+
+                <div class="section-header">
+
+                    <h2>Accounts</h2>
+
+                    <p>
+                        Monitor accounts, balances and transactions
+                    </p>
+
+                </div>
+
+
+                <div class="admin-toolbar">
+
+                    <input
+                        id="accountSearch"
+                        type="text"
+                        placeholder="Account number...">
+
+                    <select id="accountTypeFilter">
+
+                        <option value="">
+                            All Types
+                        </option>
+
+                        <option value="SAVINGS">
+                            Savings
+                        </option>
+
+                        <option value="CURRENT">
+                            Current
+                        </option>
+
+                    </select>
+
+
+                    <select id="accountStatusFilter">
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        <option value="ACTIVE">
+                            Active
+                        </option>
+
+                        <option value="INACTIVE">
+                            Inactive
+                        </option>
+
+                    </select>
+
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="loadAccounts(0)">
+                        Filter
+                    </button>
+
+                </div>
+
+
+                <div id="accountsContainer">
+                </div>
+
+            </div>
+
+
+            <div id="accountDetailPanel">
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             AUDIT LOGS
+        ================================================== -->
+
+        <section
+            id="section-audit"
+            class="admin-section">
+
+            <div class="dashboard-section">
+
+                <div class="section-header">
+
+                    <h2>Audit Logs</h2>
+
+                    <p>
+                        Records of important banking and admin operations
+                    </p>
+
+                </div>
+
+
+                <div class="admin-toolbar">
+
+                    <input
+                        id="auditAction"
+                        type="text"
+                        placeholder="Filter by action...">
+
+                    <input
+                        id="auditUsername"
+                        type="text"
+                        placeholder="Filter by user...">
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="loadAuditLogs(0)">
+                        Filter
+                    </button>
+
+                </div>
+
+
+                <div id="auditContainer">
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="logout.js"></script>
+
+    <script src="admin.js"></script>
+
+</body>
+
+</html>

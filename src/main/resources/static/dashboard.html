@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>BankFlow Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <span>🏦</span>
+
+            <h2>BankFlow</h2>
+
+        </div>
+
+
+        <nav>
+
+            <button class="nav-item active">
+                Dashboard
+            </button>
+
+            <button class="nav-item">
+                Accounts
+            </button>
+
+            <button class="nav-item">
+                Transactions
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="logout-btn"
+                onclick="logout()">
+
+                Logout
+
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =================================================
+         MAIN CONTENT
+    ================================================== -->
+
+    <main class="main-content">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="welcome-small">
+                    Welcome back,
+                </p>
+
+                <h1 data-customer-name>
+                    Customer
+                </h1>
+
+            </div>
+
+
+            <div class="profile">
+
+                <div class="avatar">
+                    👤
+                </div>
+
+                <div>
+
+                    <strong data-customer-name>
+                        Customer
+                    </strong>
+
+                    <small data-customer-email>
+                    </small>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- MESSAGE -->
+
+        <div
+            id="dashboardMessage"
+            class="dashboard-message">
+        </div>
+
+
+        <!-- =================================================
+             SUMMARY CARDS
+        ================================================== -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <span>
+                    Total Balance
+                </span>
+
+                <h2 id="totalBalance">
+                    ₹0.00
+                </h2>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total Accounts
+                </span>
+
+                <h2 id="accountCount">
+                    0
+                </h2>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                    <span>
+                        Account Status
+                    </span>
+
+                    <h2 id="activeAccounts">
+                        Active
+                    </h2>
+
+                </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ACCOUNTS
+        ================================================== -->
+
+        <section class="dashboard-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        My Accounts
+                    </h2>
+
+                    <p>
+                        Your connected bank accounts
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="accountsContainer"
+                class="accounts-grid">
+
+                <div class="loading">
+                    Loading accounts...
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TRANSACTIONS
+        ================================================== -->
+
+        <section class="dashboard-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Recent Transactions
+                    </h2>
+
+                    <p>
+                        Latest account activity
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="transactionsContainer"
+                class="transactions-container">
+
+                <div class="loading">
+                    Loading transactions...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="logout.js"></script>
+
+    <script src="dashboard.js"></script>
+
+</body>
+
+</html>

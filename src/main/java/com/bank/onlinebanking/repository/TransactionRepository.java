@@ -35,6 +35,16 @@ public interface TransactionRepository
     );
 
     // =====================================================
+    // PAGINATED HISTORY FOR ONE ACCOUNT
+    // Used by admin account monitoring.
+    // =====================================================
+
+    Page<Transaction> findByAccountIdOrderByTransactionDateDesc(
+            Long accountId,
+            Pageable pageable
+    );
+
+    // =====================================================
     // PAGINATED HISTORY FOR A CUSTOMER WITH FILTERS
     // Filters: type (DEPOSIT/WITHDRAW/TRANSFER_IN/TRANSFER_OUT),
     // status, date range, owner customer.

@@ -175,7 +175,8 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/login.html",
                                 "/register.html",
-                                "/dashboard.html"
+                                "/dashboard.html",
+                                "/admin.html"
                         ).permitAll()
 
                         // =================================
@@ -190,6 +191,7 @@ public class SecurityConfig {
                                 "/login.js",
                                 "/register.js",
                                 "/dashboard.js",
+                                "/admin.js",
                                 "/logout.js",
                                 "/favicon.ico"
                         ).permitAll()
