@@ -33,15 +33,24 @@
 
         <nav>
 
-            <button class="nav-item active">
+            <button
+                class="nav-item active"
+                data-section="dashboard"
+                onclick="showSection('dashboard')">
                 Dashboard
             </button>
 
-            <button class="nav-item">
+            <button
+                class="nav-item"
+                data-section="accounts"
+                onclick="showSection('accounts')">
                 Accounts
             </button>
 
-            <button class="nav-item">
+            <button
+                class="nav-item"
+                data-section="transactions"
+                onclick="showSection('transactions')">
                 Transactions
             </button>
 
@@ -120,7 +129,9 @@
              SUMMARY CARDS
         ================================================== -->
 
-        <section class="summary-grid">
+        <section
+            id="section-dashboard"
+            class="summary-grid page-section active">
 
             <div class="summary-card">
 
@@ -167,7 +178,9 @@
              ACCOUNTS
         ================================================== -->
 
-        <section class="dashboard-section">
+        <section
+            id="section-accounts"
+            class="dashboard-section page-section">
 
             <div class="section-header">
 
@@ -203,7 +216,9 @@
              TRANSACTIONS
         ================================================== -->
 
-        <section class="dashboard-section">
+        <section
+            id="section-transactions"
+            class="dashboard-section page-section">
 
             <div class="section-header">
 

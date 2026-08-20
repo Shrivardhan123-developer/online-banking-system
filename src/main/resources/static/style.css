@@ -273,6 +273,26 @@ nav {
 }
 
 
+/* =====================================================
+   SIDEBAR SECTION SWITCHING
+===================================================== */
+
+.page-section {
+    display: none;
+}
+
+
+.page-section.active {
+    display: block;
+}
+
+
+/* Keep the grid layout for the dashboard overview cards. */
+.summary-grid.page-section.active {
+    display: grid;
+}
+
+
 .section-header {
     margin-bottom: 16px;
 }

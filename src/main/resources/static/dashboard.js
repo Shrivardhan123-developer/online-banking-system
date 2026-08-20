@@ -13,8 +13,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     loadCustomerInfo();
+
     await loadDashboard();
 
+    showSection(currentSectionFromHash());
 });
 
 
@@ -25,6 +27,89 @@ document.addEventListener("DOMContentLoaded", async () => {
 function isLoggedIn() {
 
     return !!localStorage.getItem("token");
+}
+
+
+// =====================================================
+// SIDEBAR NAVIGATION
+// Switches between the dashboard overview, accounts and
+// transactions sections on the same page. The active
+// section is persisted in the URL hash so a browser
+// refresh keeps the user where they were.
+// =====================================================
+
+const SECTION_NAMES = [
+    "dashboard",
+    "accounts",
+    "transactions"
+];
+
+
+function currentSectionFromHash() {
+
+    const raw =
+        (window.location.hash || "")
+            .replace("#section-", "")
+            .replace("#", "");
+
+    return SECTION_NAMES.includes(raw)
+        ? raw
+        : "dashboard";
+}
+
+
+function showSection(name) {
+
+    if (!SECTION_NAMES.includes(name)) {
+        name = "dashboard";
+    }
+
+
+    // -------------------------------------------------
+    // 1. Toggle the visible page section
+    // -------------------------------------------------
+
+    SECTION_NAMES.forEach(section => {
+
+        const element =
+            document.getElementById(
+                "section-" + section
+            );
+
+        if (element) {
+
+            element.classList.toggle(
+                "active",
+                section === name
+            );
+        }
+    });
+
+
+    // -------------------------------------------------
+    // 2. Highlight the active sidebar item
+    // -------------------------------------------------
+
+    document.querySelectorAll(
+        ".nav-item"
+    ).forEach(button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.section === name
+        );
+    });
+
+
+    // -------------------------------------------------
+    // 3. Persist the section in the URL hash
+    // -------------------------------------------------
+
+    if (window.location.hash !== "#section-" + name) {
+
+        window.location.hash =
+            "section-" + name;
+    }
 }
 
 
@@ -355,6 +440,11 @@ async function selectAccount(accountNumber) {
     await loadTransactions(
         accountNumber
     );
+
+
+    // Show the transactions section so the user can
+    // see the freshly loaded per-account history.
+    showSection("transactions");
 }
 
 
