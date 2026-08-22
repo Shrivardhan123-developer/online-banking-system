@@ -118,7 +118,11 @@ public class AccountService {
     // =====================================================
 
     @Transactional
-    public Account deposit(String accountNumber, BigDecimal amount, Customer customer) {
+    public Account deposit(
+            String accountNumber,
+            BigDecimal amount,
+            String description,
+            Customer customer) {
 
         validateAmount(amount, "Deposit");
 
@@ -134,7 +138,10 @@ public class AccountService {
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);
         transaction.setType("DEPOSIT");
-        transaction.setDescription("Cash deposit");
+        transaction.setDescription(
+                (description == null || description.isBlank())
+                        ? "Cash deposit"
+                        : description.trim());
         transaction.setStatus("COMPLETED");
         transaction.setBalanceAfterTransaction(saved.getBalance());
         transaction.setTransactionDate(LocalDateTime.now());
@@ -154,7 +161,11 @@ public class AccountService {
     // =====================================================
 
     @Transactional
-    public Account withdraw(String accountNumber, BigDecimal amount, Customer customer) {
+    public Account withdraw(
+            String accountNumber,
+            BigDecimal amount,
+            String description,
+            Customer customer) {
 
         validateAmount(amount, "Withdrawal");
 
@@ -175,7 +186,10 @@ public class AccountService {
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);
         transaction.setType("WITHDRAW");
-        transaction.setDescription("Cash withdrawal");
+        transaction.setDescription(
+                (description == null || description.isBlank())
+                        ? "Cash withdrawal"
+                        : description.trim());
         transaction.setStatus("COMPLETED");
         transaction.setBalanceAfterTransaction(saved.getBalance());
         transaction.setTransactionDate(LocalDateTime.now());

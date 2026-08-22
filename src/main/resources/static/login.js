@@ -196,8 +196,15 @@ async function login() {
 
         setTimeout(() => {
 
+            // Route admins to the admin console, customers to
+            // the customer dashboard.
+            const role =
+                data?.role || localStorage.getItem("userRole");
+
             window.location.href =
-                "/dashboard.html";
+                role === "ADMIN"
+                    ? "/admin.html"
+                    : "/dashboard.html";
 
         }, 700);
 

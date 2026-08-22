@@ -128,6 +128,7 @@ public class AccountController {
         Account account = accountService.deposit(
                 request.getAccountNumber(),
                 request.getAmount(),
+                request.getDescription(),
                 customer
         );
 
@@ -157,6 +158,7 @@ public class AccountController {
         Account account = accountService.withdraw(
                 request.getAccountNumber(),
                 request.getAmount(),
+                request.getDescription(),
                 customer
         );
 

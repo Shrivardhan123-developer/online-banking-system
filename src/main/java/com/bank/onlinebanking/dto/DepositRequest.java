@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * Used for both deposit and withdrawal operations.
@@ -18,12 +19,25 @@ public class DepositRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
     private BigDecimal amount;
 
+    @Size(max = 200, message = "Description must not exceed 200 characters")
+    private String description;
+
     public DepositRequest() {
     }
 
     public DepositRequest(String accountNumber, BigDecimal amount) {
         this.accountNumber = accountNumber;
         this.amount = amount;
+    }
+
+    public DepositRequest(
+            String accountNumber,
+            BigDecimal amount,
+            String description) {
+
+        this.accountNumber = accountNumber;
+        this.amount = amount;
+        this.description = description;
     }
 
     public String getAccountNumber() {
@@ -40,5 +54,13 @@ public class DepositRequest {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

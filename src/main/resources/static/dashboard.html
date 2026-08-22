@@ -54,6 +54,13 @@
                 Transactions
             </button>
 
+            <button
+                class="nav-item"
+                data-section="profile"
+                onclick="showSection('profile')">
+                Profile
+            </button>
+
         </nav>
 
 
@@ -122,6 +129,41 @@
         <div
             id="dashboardMessage"
             class="dashboard-message">
+        </div>
+
+
+        <!-- =================================================
+             QUICK ACTIONS
+        ================================================== -->
+
+        <div
+            id="quickActions"
+            class="action-bar">
+
+            <button
+                class="btn-primary"
+                onclick="openDepositModal()">
+                Deposit
+            </button>
+
+            <button
+                class="btn-primary"
+                onclick="openWithdrawModal()">
+                Withdraw
+            </button>
+
+            <button
+                class="btn-primary"
+                onclick="openTransferModal()">
+                Transfer Money
+            </button>
+
+            <button
+                class="btn-outline"
+                onclick="showSection('transactions')">
+                View Transactions
+            </button>
+
         </div>
 
 
@@ -247,11 +289,527 @@
 
             </div>
 
+        <!-- =================================================
+             PROFILE
+        ================================================== -->
+
+        <section
+            id="section-profile"
+            class="dashboard-section page-section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        My Profile
+                    </h2>
+
+                    <p>
+                        Manage your personal details and password
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="profileContainer"
+                class="profile-panel">
+
+                <div class="loading">
+                    Loading profile...
+                </div>
+
+            </div>
+
         </section>
 
     </main>
 
+<!-- =================================================
+         MODALS
+    ================================================== -->
 
+    <!-- DEPOSIT MODAL -->
+
+    <div
+        id="depositModal"
+        class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+
+                <h3>
+                    Deposit Money
+                </h3>
+
+                <button
+                    class="modal-close"
+                    onclick="closeDepositModal()">
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label for="depositAccount">
+                    Account
+                </label>
+
+                <select
+                    id="depositAccount"
+                    class="form-input">
+                </select>
+
+
+                <label for="depositAmount">
+                    Amount
+                </label>
+
+                <input
+                    type="number"
+                    id="depositAmount"
+                    class="form-input"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00">
+
+
+                <label for="depositDescription">
+                    Description (optional)
+                </label>
+
+                <input
+                    type="text"
+                    id="depositDescription"
+                    class="form-input"
+                    maxlength="200"
+                    placeholder="e.g. Salary deposit">
+
+                <div class="modal-error" id="depositError">
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    onclick="closeDepositModal()">
+                    Cancel
+                </button>
+
+                <button
+                    id="depositSubmit"
+                    class="btn-primary"
+                    onclick="submitDeposit()">
+                    Deposit Money
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- WITHDRAW MODAL -->
+
+    <div
+        id="withdrawModal"
+        class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+
+                <h3>
+                    Withdraw Money
+                </h3>
+
+                <button
+                    class="modal-close"
+                    onclick="closeWithdrawModal()">
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label for="withdrawAccount">
+                    Account
+                </label>
+
+                <select
+                    id="withdrawAccount"
+                    class="form-input">
+                </select>
+
+
+                <label for="withdrawAmount">
+                    Amount
+                </label>
+
+                <input
+                    type="number"
+                    id="withdrawAmount"
+                    class="form-input"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00">
+
+
+                <label for="withdrawDescription">
+                    Description (optional)
+                </label>
+
+                <input
+                    type="text"
+                    id="withdrawDescription"
+                    class="form-input"
+                    maxlength="200"
+                    placeholder="e.g. ATM withdrawal">
+
+                <div class="modal-error" id="withdrawError">
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    onclick="closeWithdrawModal()">
+                    Cancel
+                </button>
+
+                <button
+                    id="withdrawSubmit"
+                    class="btn-primary"
+                    onclick="submitWithdraw()">
+                    Withdraw Money
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- TRANSFER MODAL -->
+
+    <div
+        id="transferModal"
+        class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+
+                <h3>
+                    Transfer Money
+                </h3>
+
+                <button
+                    class="modal-close"
+                    onclick="closeTransferModal()">
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label for="transferFrom">
+                    From Account
+                </label>
+
+                <select
+                    id="transferFrom"
+                    class="form-input">
+                </select>
+
+
+                <label for="transferTo">
+                    To Account
+                </label>
+
+                <input
+                    type="text"
+                    id="transferTo"
+                    class="form-input"
+                    placeholder="Receiver account number">
+
+
+                <label for="transferAmount">
+                    Amount
+                </label>
+
+                <input
+                    type="number"
+                    id="transferAmount"
+                    class="form-input"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00">
+
+
+                <label for="transferDescription">
+                    Description (optional)
+                </label>
+
+                <input
+                    type="text"
+                    id="transferDescription"
+                    class="form-input"
+                    maxlength="200"
+                    placeholder="e.g. Rent">
+
+                <div class="modal-error" id="transferError">
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    onclick="closeTransferModal()">
+                    Cancel
+                </button>
+
+                <button
+                    id="transferSubmit"
+                    class="btn-primary"
+                    onclick="submitTransfer()">
+                    Transfer Money
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRANSACTION DETAIL MODAL -->
+
+    <div
+        id="transactionModal"
+        class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+
+                <h3>
+                    Transaction Details
+                </h3>
+
+                <button
+                    class="modal-close"
+                    onclick="closeTransactionModal()">
+                    ✕
+                </button>
+
+            </div>
+
+            <div
+                id="transactionDetailBody"
+                class="modal-body">
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    onclick="closeTransactionModal()">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROFILE / CHANGE PASSWORD MODAL -->
+
+    <div
+        id="passwordModal"
+        class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+
+                <h3>
+                    Change Password
+                </h3>
+
+                <button
+                    class="modal-close"
+                    onclick="closePasswordModal()">
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label for="currentPassword">
+                    Current Password
+                </label>
+
+                <input
+                    type="password"
+                    id="currentPassword"
+                    class="form-input"
+                    autocomplete="current-password">
+
+
+                <label for="newPassword">
+                    New Password
+                </label>
+
+                <input
+                    type="password"
+                    id="newPassword"
+                    class="form-input"
+                    autocomplete="new-password">
+
+
+                <label for="confirmNewPassword">
+                    Confirm New Password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirmNewPassword"
+                    class="form-input"
+                    autocomplete="new-password">
+
+                <div class="modal-error" id="passwordError">
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    onclick="closePasswordModal()">
+                    Cancel
+                </button>
+
+                <button
+                    id="passwordSubmit"
+                    class="btn-primary"
+                    onclick="submitPasswordChange()">
+                    Update Password
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+<!-- EDIT PROFILE MODAL -->
+
+    <div
+        id="editProfileModal"
+        class="modal-overlay">
+
+        <div class="modal-card">
+
+            <div class="modal-header">
+
+                <h3>
+                    Edit Profile
+                </h3>
+
+                <button
+                    class="modal-close"
+                    onclick="closeEditProfileModal()">
+                    ✕
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label for="editFullName">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="editFullName"
+                    class="form-input">
+
+
+                <label for="editEmail">
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    id="editEmail"
+                    class="form-input">
+
+
+                <label for="editPhone">
+                    Phone
+                </label>
+
+                <input
+                    type="text"
+                    id="editPhone"
+                    class="form-input">
+
+                <div class="modal-error" id="editProfileError">
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    class="btn-secondary"
+                    onclick="closeEditProfileModal()">
+                    Cancel
+                </button>
+
+                <button
+                    id="editProfileSubmit"
+                    class="btn-primary"
+                    onclick="submitProfileUpdate()">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="logout.js"></script>
     <script src="logout.js"></script>
 
     <script src="dashboard.js"></script>
