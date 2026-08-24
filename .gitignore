@@ -31,3 +31,31 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Local environment & secrets ###
+.env
+.env.*
+*.jks
+*.p12
+*.key
+application-dev.properties
+application-local.properties
+
+### Log files ###
+*.log
+
+### Tokens / credentials ###
+token-*.txt
+
+### Test artifacts ###
+test-results/
+*.test.json
+fix-passwords.sql
+
+### PowerShell scratch scripts (local test harness only) ###
+*.ps1
