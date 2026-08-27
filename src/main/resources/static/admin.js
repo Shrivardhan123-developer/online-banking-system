@@ -535,17 +535,23 @@ async function viewCustomer(id) {
 
     lastViewedCustomerId = id;
 
-    const panel =
-        document.getElementById(
-            "customerDetailPanel"
-        );
+    const modalTitle =
+        document.getElementById("adminDetailModalTitle");
 
-    if (!panel) {
+    const modalBody =
+        document.getElementById("adminDetailModalBody");
+
+    if (!modalTitle || !modalBody) {
+        showMessage("Unable to open the detail view.", "error");
         return;
     }
 
-    panel.innerHTML =
+    modalTitle.textContent = "Customer Details";
+
+    modalBody.innerHTML =
         '<div class="loading">Loading customer details...</div>';
+
+    openAdminDetailModal();
 
     try {
 
@@ -554,70 +560,82 @@ async function viewCustomer(id) {
                 `/admin/customers/${id}`
             );
 
+        const accounts = customer.accounts || [];
+
         const accountsRows =
-            (customer.accounts || [])
-                .map(account => `
-                    <tr>
-                        <td>${account.accountNumber}</td>
-                        <td>${account.accountType}</td>
-                        <td>${formatCurrency(account.balance)}</td>
-                        <td>${statusBadge(account.status)}</td>
-                        <td>
-                            <button class="btn btn-outline"
-                                    onclick="viewAccountFromCustomer('${account.accountNumber}')">
-                                Transactions
-                            </button>
-                        </td>
-                    </tr>`)
+            accounts.map(account => `
+                <tr>
+                    <td>${account.accountNumber}</td>
+                    <td>${account.accountType}</td>
+                    <td>${formatCurrency(account.balance)}</td>
+                    <td>${statusBadge(account.status)}</td>
+                    <td>
+                        <button class="btn btn-outline"
+                                onclick="viewAccountFromCustomer('${account.accountNumber}')">
+                            Transactions
+                        </button>
+                    </td>
+                </tr>`)
                 .join("");
 
-        panel.innerHTML = `
-            <div class="detail-panel">
+        modalBody.innerHTML = `
 
-                <div class="section-header">
-                    <h2>Customer #${customer.id} ${escapeHtml(customer.fullName)}</h2>
-                </div>
-
-                <div class="detail-grid">
-                    <div>
-                        <div class="label">Email</div>
-                        <div class="value">${escapeHtml(customer.email)}</div>
-                    </div>
-                    <div>
-                        <div class="label">Phone</div>
-                        <div class="value">${escapeHtml(customer.phone || "-")}</div>
-                    </div>
-                    <div>
-                        <div class="label">Role</div>
-                        <div class="value">${customer.role}</div>
-                    </div>
-                    <div>
-                        <div class="label">Status</div>
-                        <div class="value">${statusBadge(customer.status)}</div>
-                    </div>
-                </div>
-
-                ${accountsRows
-                    ? `<h3 style="margin-top:18px; margin-bottom:10px;">Accounts</h3>
-                       <table class="admin-table">
-                           <thead>
-                               <tr>
-                                   <th>Account Number</th>
-                                   <th>Type</th>
-                                   <th>Balance</th>
-                                   <th>Status</th>
-                                   <th>Action</th>
-                               </tr>
-                           </thead>
-                           <tbody>${accountsRows}</tbody>
-                       </table>`
-                    : ""}
+            <div class="detail-line">
+                <span>Customer ID</span>
+                <strong>${customer.id}</strong>
             </div>
+
+            <div class="detail-line">
+                <span>Full Name</span>
+                <strong>${escapeHtml(customer.fullName)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Email</span>
+                <strong>${escapeHtml(customer.email)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Phone</span>
+                <strong>${escapeHtml(customer.phone || "-")}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Role</span>
+                <strong>${customer.role}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Status</span>
+                <strong>${statusBadge(customer.status)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Number of Accounts</span>
+                <strong>${accounts.length}</strong>
+            </div>
+
+            ${accounts.length > 0 ? `
+                <div class="detail-section-title">Accounts</div>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Account Number</th>
+                            <th>Type</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>${accountsRows}</tbody>
+                </table>` : ""}
         `;
 
     } catch (error) {
 
         handleApiError(error);
+
+        closeAdminDetailModal();
     }
 }
 
@@ -816,6 +834,51 @@ async function loadAccounts(page) {
     }
 }
 // =====================================================
+// ADMIN DETAIL MODAL HELPERS
+// =====================================================
+
+function openAdminDetailModal() {
+
+    const overlay =
+        document.getElementById("adminDetailModal");
+
+    if (overlay) {
+        overlay.classList.add("active");
+    }
+}
+
+
+function closeAdminDetailModal() {
+
+    const overlay =
+        document.getElementById("adminDetailModal");
+
+    if (overlay) {
+        overlay.classList.remove("active");
+    }
+}
+
+
+// Close on backdrop click
+document.addEventListener("click", event => {
+
+    if (event.target &&
+        event.target.id === "adminDetailModal") {
+        closeAdminDetailModal();
+    }
+});
+
+
+// Close on Escape
+document.addEventListener("keydown", event => {
+
+    if (event.key === "Escape") {
+        closeAdminDetailModal();
+    }
+});
+
+
+// =====================================================
 // ACCOUNT DETAILS + TRANSACTION MONITORING
 // =====================================================
 
@@ -823,17 +886,23 @@ async function viewAccount(accountNumber) {
 
     lastViewedAccount = accountNumber;
 
-    const panel =
-        document.getElementById(
-            "accountDetailPanel"
-        );
+    const modalTitle =
+        document.getElementById("adminDetailModalTitle");
 
-    if (!panel) {
+    const modalBody =
+        document.getElementById("adminDetailModalBody");
+
+    if (!modalTitle || !modalBody) {
+        showMessage("Unable to open the account detail view.", "error");
         return;
     }
 
-    panel.innerHTML =
+    modalTitle.textContent = "Account Details";
+
+    modalBody.innerHTML =
         '<div class="loading">Loading account details...</div>';
+
+    openAdminDetailModal();
 
     try {
 
@@ -842,37 +911,41 @@ async function viewAccount(accountNumber) {
                 `/admin/accounts/${accountNumber}`
             );
 
-        panel.innerHTML = `
-            <div class="detail-panel">
+        modalBody.innerHTML = `
 
-                <div class="section-header">
-                    <h2>Account ${account.accountNumber}</h2>
-                </div>
-
-                <div class="detail-grid">
-                    <div>
-                        <div class="label">Type</div>
-                        <div class="value">${account.accountType}</div>
-                    </div>
-                    <div>
-                        <div class="label">Balance</div>
-                        <div class="value">${formatCurrency(account.balance)}</div>
-                    </div>
-                    <div>
-                        <div class="label">Status</div>
-                        <div class="value">${statusBadge(account.status)}</div>
-                    </div>
-                    <div>
-                        <div class="label">Owner</div>
-                        <div class="value">${escapeHtml(account.customerName || "-")}</div>
-                    </div>
-                </div>
-
-                <div id="accountTxContainer"
-                     style="margin-top:20px;">
-                    <div class="loading">Loading transactions...</div>
-                </div>
+            <div class="detail-line">
+                <span>Account Number</span>
+                <strong>${account.accountNumber}</strong>
             </div>
+
+            <div class="detail-line">
+                <span>Type</span>
+                <strong>${account.accountType}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Balance</span>
+                <strong>${formatCurrency(account.balance)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Status</span>
+                <strong>${statusBadge(account.status)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Owner</span>
+                <strong>${escapeHtml(account.customerName || "-")}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Owner Email</span>
+                <strong>${escapeHtml(account.customerEmail || "-")}</strong>
+            </div>
+
+            <div class="detail-section-title">Recent Transactions</div>
+
+            <div id="adminAccountTxContainer"></div>
         `;
 
         await loadAccountTransactions(accountNumber, 0);
@@ -880,6 +953,8 @@ async function viewAccount(accountNumber) {
     } catch (error) {
 
         handleApiError(error);
+
+        closeAdminDetailModal();
     }
 }
 
@@ -895,7 +970,7 @@ async function loadAccountTransactions(
 
     const container =
         document.getElementById(
-            "accountTxContainer"
+            "adminAccountTxContainer"
         );
 
     if (!container) {
@@ -922,7 +997,6 @@ async function loadAccountTransactions(
             data.content.length === 0) {
 
             container.innerHTML = `
-                <h3 style="margin-bottom:10px;">Recent Transactions</h3>
                 <div class="empty-state">
                     No transactions found for this account.
                 </div>`;
@@ -941,12 +1015,16 @@ async function loadAccountTransactions(
                         ? "-"
                         : formatCurrency(tx.balanceAfterTransaction)}</td>
                     <td>${escapeHtml(tx.description || "-")}</td>
+                    <td>
+                        <button class="btn btn-outline"
+                                onclick="viewTransactionDetails(${tx.id}, '${accountNumber}')">
+                            View
+                        </button>
+                    </td>
                 </tr>`)
                 .join("");
 
         container.innerHTML = `
-            <h3 style="margin-bottom:10px;">Recent Transactions</h3>
-
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -956,6 +1034,7 @@ async function loadAccountTransactions(
                         <th>Amount</th>
                         <th>Balance After</th>
                         <th>Description</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -973,6 +1052,114 @@ async function loadAccountTransactions(
 
         handleApiError(error);
     }
+}
+
+
+// =====================================================
+// TRANSACTION DETAIL MODAL (admin)
+// =====================================================
+
+function viewTransactionDetails(transactionId, accountNumber) {
+
+    const modalTitle =
+        document.getElementById("adminDetailModalTitle");
+
+    const modalBody =
+        document.getElementById("adminDetailModalBody");
+
+    if (!modalTitle || !modalBody) {
+        return;
+    }
+
+    modalTitle.textContent = "Transaction Details";
+
+    modalBody.innerHTML =
+        '<div class="loading">Loading transaction details...</div>';
+
+    openAdminDetailModal();
+
+    apiFetch(
+        `/admin/accounts/${accountNumber}/transactions?page=0&size=50`
+    ).then(data => {
+
+        const transaction =
+            (data.content || []).find(tx =>
+                String(tx.id) === String(transactionId)
+            );
+
+        if (!transaction) {
+            modalBody.innerHTML =
+                '<div class="empty-state">Transaction not found.</div>';
+            return;
+        }
+
+        const isIncoming =
+            transaction.type === "DEPOSIT" ||
+            transaction.type === "TRANSFER_IN";
+
+        modalBody.innerHTML = `
+
+            <div class="detail-line">
+                <span>Reference</span>
+                <strong>${transaction.transactionReference || "-"}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Date</span>
+                <strong>${formatDate(transaction.transactionDate)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Type</span>
+                <strong>${transaction.type || "-"}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Amount</span>
+                <strong class="${isIncoming ? "badge-active" : "badge-suspended"}">
+                    ${isIncoming ? "+" : "-"}${formatCurrency(transaction.amount)}
+                </strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Status</span>
+                <strong>${transaction.status || "-"}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Account</span>
+                <strong>${transaction.accountNumber || "-"}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Source</span>
+                <strong>${transaction.sourceAccount || "-"}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Destination</span>
+                <strong>${transaction.destinationAccount || "-"}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Balance After</span>
+                <strong>${transaction.balanceAfterTransaction === null
+                    ? "-"
+                    : formatCurrency(transaction.balanceAfterTransaction)}</strong>
+            </div>
+
+            <div class="detail-line">
+                <span>Description</span>
+                <strong>${escapeHtml(transaction.description || "-")}</strong>
+            </div>
+        `;
+
+    }).catch(error => {
+
+        handleApiError(error);
+
+        closeAdminDetailModal();
+    });
 }
 
 
